@@ -22,3 +22,7 @@ all future services.
 - Consistent **API error handling**
 - **Database connection** and **migrations**
 - Built in **filtering** and pagination **support**
+
+**Requirements**:
+
+- GoLang >= 1.25.0

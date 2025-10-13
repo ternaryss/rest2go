@@ -1,0 +1,8 @@
+{
+	"name": "Go",
+	"image": "mcr.microsoft.com/devcontainers/go:1.25-bookworm",
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y cmake ripgrep",
+	"containerEnv": {
+		"TZ": "Europe/Warsaw"
+	}
+}
