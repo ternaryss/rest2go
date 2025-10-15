@@ -27,10 +27,11 @@ all future services.
 
 - GoLang >= 1.25.0
 
-**Table of contents::
+**Table of contents**:
 
 1. [Settings](#Settings)
 2. [Logs](#Logs)
+3. [Errors handling](#Errors-handling)
 
 ## Settings
 
@@ -106,3 +107,57 @@ Loading uses generics, so when `AppSettings` are used, just provide proper type.
 `rest2go` provides default logging configuration with usage of `slog` and `lumberjack`. Application using library 
 could log to console or console & rotable file. Configuration & how to change default behaviour is described in 
 [Settings](#Settings) chapter.
+
+## Errors handling
+
+`rest2go` provides standard for REST API errors handling. All errors created during request handling are processed by 
+library, any other error not connected to the request is handled by GoLang language layer. All REST API errors will be 
+returned in standardized structure:
+
+```json
+{
+    "timestamp": "2024-06-28T16:47:23Z",
+    "code": "err.invalid-request",
+    "message": "Invalid Request",
+    "details": [
+        {
+            "field": "y",
+            "code": "val.division_by_zero",
+            "message": "Division by zero",
+            "value": "0.0",
+            "expected": "y != 0"
+        }
+    ]
+}
+```
+
+To handle error, just use `rest2go.HandleError(err, response)`. Snippet below shows, how to create request validation 
+errors that can be handled:
+
+```go
+func validate(veh VehicleRequestDto) error {
+  vehTypes := []string{TypeCar, TypeMoto}
+  errors := []rest2go.FieldError{}
+
+  if strings.TrimSpace(veh.Type) != "" {
+    if !slices.Contains(vehTypes, veh.Type) {
+      errors = append(errors, rest2go.NewDetailedFieldError("type", "val.invalid", "Invalid type", veh.Type, strings.Join(vehTypes, ",")))
+    }
+  } else {
+    errors = append(errors, rest2go.NewFieldError("type", "val.required", "Type is required"))
+  }
+
+  if len(errors) != 0 {
+    return rest2go.NewApiError(400, "vehicle validation failed", errors...)
+  }
+
+  return nil
+}
+```
+
+There are two types of field errors:
+
+1. `NewFieldError` - basic error with field indication
+2. `NewDetailedFieldError` - extended error for field with given value and what is expected
+
+**WARNING**: errors handling mechanism uses `slog` by default.
