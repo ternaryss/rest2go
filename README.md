@@ -31,7 +31,8 @@ all future services.
 
 1. [Settings](#Settings)
 2. [Logs](#Logs)
-3. [Errors handling](#Errors-handling)
+3. [Middlewares](#Middlewares)
+4. [Errors handling](#Errors-handling)
 
 ## Settings
 
@@ -107,6 +108,26 @@ Loading uses generics, so when `AppSettings` are used, just provide proper type.
 `rest2go` provides default logging configuration with usage of `slog` and `lumberjack`. Application using library 
 could log to console or console & rotable file. Configuration & how to change default behaviour is described in 
 [Settings](#Settings) chapter.
+
+## Middlewares
+
+`rest2go` provides set of basic middlewares and ability to combine them in middlewares chain. Idea is simple - execute 
+some chunks of code before HTTP request is handled by business logic. Snippet below shows how to create middlewares 
+chain.
+
+```go
+router := http.NewServeMux()
+server := &http.Server{
+  Addr:    addr,
+  Handler: Middlewares(<m1>, <m2>, ..., <mx>)(router),
+}
+```
+
+### Log request & response
+
+`LogRequestAndResponseMiddleware` is created to log details about incoming HTTP request and out coming response. 
+`slog` is used to print HTTP method and path. Body is logged only for `application/json` content type. Additionally 
+there is UUID that indicates that given logs was written for single REST API call.
 
 ## Errors handling
 
