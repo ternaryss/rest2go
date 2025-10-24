@@ -16,6 +16,20 @@ func newLogs() Logs {
 	}
 }
 
+type Server struct {
+	Host            string `yaml:"host"`
+	Port            int    `yaml:"port"`
+	NotFoundHandler bool   `yaml:"not-found-handler"`
+}
+
+func newServer() Server {
+	return Server{
+		Host:            "0.0.0.0",
+		Port:            8080,
+		NotFoundHandler: false,
+	}
+}
+
 type Header struct {
 	Enabled bool     `yaml:"enabled"`
 	Key     string   `yaml:"key"`

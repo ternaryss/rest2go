@@ -115,6 +115,5 @@ func HandleError(err error, response http.ResponseWriter) {
 }
 
 func HandleNotFoundError(response http.ResponseWriter, request *http.Request) {
-	// TODO: use in HTTP server configuration (remember about README)
-	HandleError(NewApiError(404, "Not found"), response)
+	HandleError(NewApiError(404, "not found"), response)
 }

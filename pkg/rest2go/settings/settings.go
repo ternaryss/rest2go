@@ -25,11 +25,13 @@ type Defaults interface {
 
 type Settings struct {
 	Logs          Logs          `yaml:"logs"`
+	Server        Server        `yaml:"server"`
 	Authorization Authorization `yaml:"authorization"`
 }
 
 func (s *Settings) SetDefaults() {
 	s.Logs = newLogs()
+	s.Server = newServer()
 	s.Authorization = newAuthorization()
 }
 

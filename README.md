@@ -31,8 +31,9 @@ all future services.
 
 1. [Settings](#Settings)
 2. [Logs](#Logs)
-3. [Middlewares](#Middlewares)
-4. [Errors handling](#Errors-handling)
+3. [HTTP server](#HTTP-server)
+4. [Middlewares](#Middlewares)
+5. [Errors handling](#Errors-handling)
 
 ## Settings
 
@@ -58,6 +59,15 @@ logs:
   max-size: 10
   # Rotable logs file max age (days)
   max-age: 7
+
+# HTTP server configuration
+server:
+  # HTTP server host
+  host: "0.0.0.0"
+  # HTTP server port
+  port: 8080
+  # Indicates if global HTTP 404 should be handled by rest2go errors handler
+  not-found-handler: false
 
 # Authorization configuration
 authorization:
@@ -121,6 +131,31 @@ Loading uses generics, so when `AppSettings` are used, just provide proper type.
 could log to console or console & rotable file. Configuration & how to change default behaviour is described in 
 [Settings](#Settings) chapter.
 
+## HTTP server
+
+`rest2go` provides preconfigured HTTP server. Configuration in details is described in [Settings](#Settings) chapter. 
+By default, HTTP server needs some configuration, routes and set of middlewares. Example below shows how to use 
+preconfigured server.
+
+```go
+settings, err := settings.Load[settings.Settings]()
+
+if err != nil {
+  // Handle error
+}
+
+router := http.NewServeMux()
+router.HandleFunc("GET /", [handle_func])
+server := rest2go.NewServer(settings.Server, router, LogRequestAndResponseMiddleware, ApiKeyAuthMiddleware)
+
+if err := server.Run(); err != nil {
+  // Handle error
+}
+```
+
+Passing middlewares is optional. Library also gives ability to handle HTTP 404 Not Found error globally with usage 
+of [Errors handling](#Errors-handling).
+
 ## Middlewares
 
 `rest2go` provides set of basic middlewares and ability to combine them in middlewares chain. Idea is simple - execute 
@@ -141,7 +176,7 @@ server := &http.Server{
 `slog` is used to print HTTP method and path. Body is logged only for `application/json` content type. Additionally 
 there is UUID that indicates that given logs was written for single REST API call.
 
-## ApiKeyAuthMiddleware
+### ApiKeyAuthMiddleware
 
 `ApiKeyAuthMiddleware` is created to provide basic authorization mechanism for microservice. If enabled, every HTTP 
 request is checked if there was `Api-Key` header with proper secret key value. Additionally, it can be configured 
