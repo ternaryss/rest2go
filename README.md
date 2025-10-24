@@ -58,6 +58,18 @@ logs:
   max-size: 10
   # Rotable logs file max age (days)
   max-age: 7
+
+# Authorization configuration
+authorization:
+  # Authorization by Api-Key header
+  header:
+    # Api-Key header authorization enabled?
+    enabled: false
+    # Authorization key value (header value)
+    key: ""
+    # List of ant patterns for public API
+    public:
+      - "[ant_pattern]" 
 ```
 
 Application using library can have its own configuration. For proper work with configurable library components it should 
@@ -128,6 +140,12 @@ server := &http.Server{
 `LogRequestAndResponseMiddleware` is created to log details about incoming HTTP request and out coming response. 
 `slog` is used to print HTTP method and path. Body is logged only for `application/json` content type. Additionally 
 there is UUID that indicates that given logs was written for single REST API call.
+
+## ApiKeyAuthMiddleware
+
+`ApiKeyAuthMiddleware` is created to provide basic authorization mechanism for microservice. If enabled, every HTTP 
+request is checked if there was `Api-Key` header with proper secret key value. Additionally, it can be configured 
+with ant patterns to make some API public. Detailed configuration is described in [Settings](#Settings) chapter.
 
 ## Errors handling
 

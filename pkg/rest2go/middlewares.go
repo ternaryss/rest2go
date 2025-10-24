@@ -5,9 +5,12 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"path"
+	"regexp"
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/ternaryss/rest2go/pkg/rest2go/settings"
 )
 
 type Middleware func(http.Handler) http.HandlerFunc
@@ -43,6 +46,42 @@ func LogRequestAndResponseMiddleware(next http.Handler) http.HandlerFunc {
 			slog.Info("HTTP Response", "uid", uid, "status", writer.status, "body", writer.body.String())
 		default:
 			slog.Info("HTTP Response", "uid", uid, "status", writer.status)
+		}
+	}
+}
+
+func ApiKeyAuthMiddleware(authorization settings.Authorization) Middleware {
+	conf := authorization.Header
+	patterns := make([]*regexp.Regexp, 0, len(conf.Public))
+
+	for _, pattern := range conf.Public {
+		patterns = append(patterns, regexp.MustCompile("^"+antToRegex(pattern)+"$"))
+	}
+
+	return func(next http.Handler) http.HandlerFunc {
+		return func(response http.ResponseWriter, request *http.Request) {
+			if !conf.Enabled {
+				next.ServeHTTP(response, request)
+				return
+			}
+
+			url := path.Clean(request.URL.Path)
+
+			for _, pattern := range patterns {
+				if pattern.MatchString(url) {
+					next.ServeHTTP(response, request)
+					return
+				}
+			}
+
+			key := request.Header.Get("Api-Key")
+
+			if key != conf.Key {
+				HandleError(NewApiError(401, "unauthorized"), response)
+				return
+			}
+
+			next.ServeHTTP(response, request)
 		}
 	}
 }

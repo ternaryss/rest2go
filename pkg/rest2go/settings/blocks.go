@@ -15,3 +15,27 @@ func newLogs() Logs {
 		MaxAge:      7,
 	}
 }
+
+type Header struct {
+	Enabled bool     `yaml:"enabled"`
+	Key     string   `yaml:"key"`
+	Public  []string `yaml:"public"`
+}
+
+func newHeader() Header {
+	return Header{
+		Enabled: false,
+		Key:     "",
+		Public:  []string{},
+	}
+}
+
+type Authorization struct {
+	Header Header `yaml:"header"`
+}
+
+func newAuthorization() Authorization {
+	return Authorization{
+		Header: newHeader(),
+	}
+}

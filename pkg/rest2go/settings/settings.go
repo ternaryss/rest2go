@@ -24,11 +24,13 @@ type Defaults interface {
 }
 
 type Settings struct {
-	Logs Logs `yaml:"logs"`
+	Logs          Logs          `yaml:"logs"`
+	Authorization Authorization `yaml:"authorization"`
 }
 
 func (s *Settings) SetDefaults() {
 	s.Logs = newLogs()
+	s.Authorization = newAuthorization()
 }
 
 func (s *Settings) ConfigureLogs() {
