@@ -27,12 +27,14 @@ type Settings struct {
 	Logs          Logs          `yaml:"logs"`
 	Server        Server        `yaml:"server"`
 	Authorization Authorization `yaml:"authorization"`
+	Database      Database      `yaml:"database"`
 }
 
 func (s *Settings) SetDefaults() {
 	s.Logs = newLogs()
 	s.Server = newServer()
 	s.Authorization = newAuthorization()
+	s.Database = newDatabase()
 }
 
 func (s *Settings) ConfigureLogs() {

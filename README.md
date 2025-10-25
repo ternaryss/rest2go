@@ -34,6 +34,7 @@ all future services.
 3. [HTTP server](#HTTP-server)
 4. [Middlewares](#Middlewares)
 5. [Errors handling](#Errors-handling)
+6. [Database connection](#Database-connection)
 
 ## Settings
 
@@ -80,6 +81,23 @@ authorization:
     # List of ant patterns for public API
     public:
       - "[ant_pattern]" 
+
+# Database connection configuration
+database:
+  # Database driver (sqlite3/postgres)
+  driver: "sqlite3"
+  # Database host
+  host: "./data/app.db"
+  # Database port
+  port: 0
+  # Database username
+  user: ""
+  # Database password
+  password: ""
+  # Database name
+  name: ""
+  # Database schema
+  schema: ""
 ```
 
 Application using library can have its own configuration. For proper work with configurable library components it should 
@@ -235,3 +253,104 @@ There are two types of field errors:
 2. `NewDetailedFieldError` - extended error for field with given value and what is expected
 
 **WARNING**: errors handling mechanism uses `slog` by default.
+
+## Database connection
+
+`rest2go` provides utilities to initialize database connection. All available settings are described in 
+[Settings](#Settings) chapter. Supported drivers are described below. Idea behind this is to provide database driver 
+from parent application (`blank import` in `main.go`) and use it with set of tools provided by library. First of all, 
+there is database connection provider that works as singleton:
+
+```go
+settings, err := settings.Load[settings.Settings]()
+
+if err != nil {
+  // Handle error
+}
+
+provider, err := rest2go.NewDbProvider(settings.Database)
+
+if err != nil {
+  // Handle error
+}
+
+defer provider.CloseConnection()
+```
+
+After initialization, stores can be created. Every store should implement interface visible below:
+
+```go
+// Interface
+type DbStore interface {
+	Begin() (*DbCtx, error)
+	Commit(context *DbCtx) error
+	Rollback(context *DbCtx) error
+}
+
+// Implementation
+type vehiclesStore struct {
+  db *sql.DB
+}
+
+func NewVehiclesStore(db *sql.DB) *vehiclesStore {
+  return &vehiclesStore{
+    db: db,
+  }
+}
+
+func (s *vehiclesStore) Begin() (*rest2go.DbCtx, error) {
+  tx, err := s.db.Begin()
+
+  if err != nil {
+    return nil, err
+  }
+
+  return rest2go.NewDbContext(tx), nil
+}
+
+func (s *vehiclesStore) Commit(context *rest2go.DbCtx) error {
+  if err := context.Tx.Commit(); err != nil {
+    return err
+  }
+
+  return nil
+}
+
+func (s *vehiclesStore) Rollback(context *rest2go.DbCtx) error {
+  if err := context.Tx.Rollback(); err != nil {
+    return err
+  }
+
+  return nil
+}
+```
+
+`db` for store can be obtained from `provider` with call `provider.Db()`. By default, library is configured to handle 
+SQLite database that exists in `./data/app.db`.
+
+### SQLite
+
+By default, library is configured to handle SQLite database. Connection can be configured as follows:
+
+```yml
+database:
+  driver: "sqlite3"
+  host: "./data/app.db" # Path to database file (given example is library default)
+```
+
+Additionally, connection is automatically prepared to respect foreign keys - `PRAGMA FOREIGN_KEYS=ON;`.
+
+### Postgres
+
+Library supports Postgres databases. Connection can be configured as follows:
+
+```yml
+database:
+  driver: "postgres"
+  host: "" # Database URL
+  port: 5432 # Database port
+  user: "" # Database username
+  password: "" # Database password
+  name: "" # Database name
+  schema: "public" # Database schema
+```

@@ -53,3 +53,25 @@ func newAuthorization() Authorization {
 		Header: newHeader(),
 	}
 }
+
+type Database struct {
+	Driver   string `yaml:"driver"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Name     string `yaml:"name"`
+	Schema   string `yaml:"schema"`
+}
+
+func newDatabase() Database {
+	return Database{
+		Driver:   "sqlite3",
+		Host:     "./data/app.db",
+		Port:     0,
+		User:     "",
+		Password: "",
+		Name:     "",
+		Schema:   "",
+	}
+}
