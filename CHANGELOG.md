@@ -4,6 +4,7 @@ History of **rest2go** library with changes description.
 
 ## Next release
 
+- `FEATURE` Filtering
 - `FEATURE` Pagination
 - `FEATURE` Database migrations by Goose
 - `FEATURE` SQLite and Postgres database connection

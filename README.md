@@ -34,9 +34,10 @@ all future services.
 3. [HTTP server](#HTTP-server)
 4. [Middlewares](#Middlewares)
 5. [Pagination](#Pagination)
-6. [Errors handling](#Errors-handling)
-7. [Database connection](#Database-connection)
-8. [Database migrations](#Database-migrations)
+6. [Filtering](#Filtering)
+7. [Errors handling](#Errors-handling)
+8. [Database connection](#Database-connection)
+9. [Database migrations](#Database-migrations)
 
 ## Settings
 
@@ -196,7 +197,7 @@ server := &http.Server{
 `slog` is used to print HTTP method and path. Body is logged only for `application/json` content type. Additionally 
 there is UUID that indicates that given logs was written for single REST API call.
 
-### ApiKeyAuthMiddleware
+### Api-Key header authorization
 
 `ApiKeyAuthMiddleware` is created to provide basic authorization mechanism for microservice. If enabled, every HTTP 
 request is checked if there was `Api-Key` header with proper secret key value. Additionally, it can be configured 
@@ -267,6 +268,34 @@ func (c *getVehiclesCmd) Execute(qry url.Values) (rest2go.PageDto[types.VehicleD
   return rest2go.NewPageDto(pagination, content), nil
 }
 ```
+
+## Filtering
+
+`rest2go` provides simple tools for REST API result set filtering & sorting. It is ready to get parameters from URL 
+`GET /vehicles?name={name}&sort={brand}:{asc},{name}:{desc}`. With that call, filter can be created.
+
+```go
+func (c *getVehiclesCmd) Execute(qry url.Values) (rest2go.PageDto[types.VehicleDto], error) {
+  // Define colums for which result set can be ordered (other values not accepted)
+  sortable := []string{"brand", "name", "pricePerDay"}
+
+  // Register filter with prefix (details below) & default ordering (if URL sort query is invalid)
+  filter := rest2go.NewFilter("", "brand asc, name desc", qry.Get("sort"), sortable)
+
+  // Set value for filtering by name
+  filter.Params["name"] = strings.TrimSpace(qry.Get("name"))
+
+  // Use params & sort in database query
+  quantity, err := c.vehiclesStore.CountByFilter(filter) 
+
+  // Rest of code
+
+  return rest2go.NewPageDto(pagination, content), nil
+}
+```
+
+When registering filter, `prefix` can be set. It is useful, to provide proper ordering when SQL query has `join` clause. 
+With good REST API practices, sorting should work on parent JSON structure, so filter can take only one prefix for sorting.
 
 ## Errors handling
 
