@@ -35,6 +35,7 @@ all future services.
 4. [Middlewares](#Middlewares)
 5. [Errors handling](#Errors-handling)
 6. [Database connection](#Database-connection)
+7. [Database migrations](#Database-migrations)
 
 ## Settings
 
@@ -353,4 +354,31 @@ database:
   password: "" # Database password
   name: "" # Database name
   schema: "public" # Database schema
+```
+
+## Database migrations
+
+`rest2go` is ready to handle database migrations with usage of [Goose](https://github.com/pressly/goose). All you need 
+to do, is to place SQL migrations in `./migrations/${driver}` directory. Driver configured according to [Settings](#Settings) 
+chapter also indicates what `Goose` should use. Snippet below shows how to migrate database within application.
+
+```go
+
+settings, err := settings.Load[settings.Settings]()
+
+if err != nil {
+  // Handle error
+}
+
+provider, err := rest2go.NewDbProvider(settings.Database)
+
+if err != nil {
+  // Handle error
+}
+
+defer provider.CloseConnection()
+
+if err := provider.MigrateDatabase(); err != nil {
+  // Handle error
+}
 ```

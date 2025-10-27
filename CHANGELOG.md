@@ -4,6 +4,7 @@ History of **rest2go** library with changes description.
 
 ## Next release
 
+- `FEATURE` Database migrations by Goose
 - `FEATURE` SQLite and Postgres database connection
 - `FEATURE` Preconfigured HTTP server
 - `FEATURE` Api-Key header authorization middleware

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/pressly/goose/v3"
 	"github.com/ternaryss/rest2go/pkg/rest2go/settings"
 )
 
@@ -69,6 +70,20 @@ func (p *dbProvider) Db() *sql.DB {
 
 func (p *dbProvider) CloseConnection() error {
 	return p.db.Close()
+}
+
+func (p *dbProvider) MigrateDatabase() error {
+	migrations := fmt.Sprintf("./migrations/%s", p.conf.Driver)
+
+	if err := goose.SetDialect(p.conf.Driver); err != nil {
+		return err
+	}
+
+	if err := goose.Up(p.db, migrations); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func initSQLiteConnection(conf settings.Database) (*sql.DB, error) {
