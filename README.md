@@ -33,9 +33,10 @@ all future services.
 2. [Logs](#Logs)
 3. [HTTP server](#HTTP-server)
 4. [Middlewares](#Middlewares)
-5. [Errors handling](#Errors-handling)
-6. [Database connection](#Database-connection)
-7. [Database migrations](#Database-migrations)
+5. [Pagination](#Pagination)
+6. [Errors handling](#Errors-handling)
+7. [Database connection](#Database-connection)
+8. [Database migrations](#Database-migrations)
 
 ## Settings
 
@@ -201,6 +202,72 @@ there is UUID that indicates that given logs was written for single REST API cal
 request is checked if there was `Api-Key` header with proper secret key value. Additionally, it can be configured 
 with ant patterns to make some API public. Detailed configuration is described in [Settings](#Settings) chapter.
 
+## Pagination
+
+`rest2go` provides tools to handle REST API result set pagination. Data read with pagination will be returned as json 
+below.
+
+```json
+{
+  "page": 1, // current page
+  "pages": 10, // quantity of all pages
+  "size": 20, // current page size
+  "pageable": 200, // quantity of all records to paginate
+  "content": [] // page content (your data)
+}
+```
+
+Library has its defaults:
+
+1. `rest2go.DefaultPage = 1`
+2. `rest2go.DefaultPageSize = 20`
+
+Snippet below shows how to use pagination.
+
+```go
+func (c *getVehiclesCmd) Execute(qry url.Values) (rest2go.PageDto[types.VehicleDto], error) {
+  quantity, err := c.vehiclesStore.CountVehicles()
+
+  if err != nil {
+    return rest2go.EmptyPageDto[types.VehicleDto](), err
+  }
+
+  page, err := strconv.Atoi(qry.Get("page"))
+
+  if err != nil {
+    page = rest2go.DefaultPage
+  }
+
+  size, err := strconv.Atoi(qry.Get("size"))
+
+  if err != nil {
+    size = rest2go.DefaultPageSize
+  }
+
+  pagination, err := rest2go.NewPagination(page, size, quantity)
+
+  if err != nil {
+    return rest2go.EmptyPageDto[types.VehicleDto](), nil
+  }
+
+  // Use pagination in database query (limit & offset)
+  vehicles, err := c.vehiclesStore.GetVehicles(pagination)
+
+  if err != nil {
+    return rest2go.EmptyPageDto[types.VehicleDto](), err
+  }
+
+  content := []types.VehicleDto{}
+
+  for _, veh := range vehicles {
+    dto := types.NewVehicleDto(veh.Id, veh.Type, veh.Brand, veh.Name)
+    content = append(content, dto)
+  }
+
+  return rest2go.NewPageDto(pagination, content), nil
+}
+```
+
 ## Errors handling
 
 `rest2go` provides standard for REST API errors handling. All errors created during request handling are processed by 
@@ -363,7 +430,6 @@ to do, is to place SQL migrations in `./migrations/${driver}` directory. Driver 
 chapter also indicates what `Goose` should use. Snippet below shows how to migrate database within application.
 
 ```go
-
 settings, err := settings.Load[settings.Settings]()
 
 if err != nil {
