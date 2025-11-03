@@ -2,7 +2,7 @@
 
 History of **rest2go** library with changes description.
 
-## Next release
+## 1.0.0 (2025-11-03)
 
 - `FEATURE` Health check
 - `FEATURE` Filtering
