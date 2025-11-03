@@ -36,8 +36,9 @@ all future services.
 5. [Pagination](#Pagination)
 6. [Filtering](#Filtering)
 7. [Errors handling](#Errors-handling)
-8. [Database connection](#Database-connection)
-9. [Database migrations](#Database-migrations)
+8. [Health check](#Health-check)
+9. [Database connection](#Database-connection)
+10. [Database migrations](#Database-migrations)
 
 ## Settings
 
@@ -70,6 +71,8 @@ server:
   host: "0.0.0.0"
   # HTTP server port
   port: 8080
+  # Indicates if health check is available
+  health-check: false
   # Indicates if global HTTP 404 should be handled by rest2go errors handler
   not-found-handler: false
 
@@ -350,6 +353,25 @@ There are two types of field errors:
 2. `NewDetailedFieldError` - extended error for field with given value and what is expected
 
 **WARNING**: errors handling mechanism uses `slog` by default.
+
+## Health check
+
+`rest2go` provides simple health check functionality. When `HTTP server` is configured to serve `GET /health` 
+(configuration described in [Settings](#Settings) chapter) application using library will return JSON with basic health 
+statistics.
+
+```json
+{
+  "timestamp": "2024-06-28T16:47:23Z",
+  "version": "go1.25.0",
+  "uptime": 60.0, // Application uptime (seconds)
+  "cpu": 20.0, // CPU usage (percent)
+  "memoryUsed": 500.0, // RAM used (MB)
+  "memoryAvailable": 1024.0, // Available RAM (MB)
+  "memoryTotal": 16384.0, // Total RAM (MB)
+  "routines": 10 // Quantity of Go routines
+}
+```
 
 ## Database connection
 

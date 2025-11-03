@@ -19,6 +19,7 @@ func newLogs() Logs {
 type Server struct {
 	Host            string `yaml:"host"`
 	Port            int    `yaml:"port"`
+	HealthCheck     bool   `yaml:"health-check"`
 	NotFoundHandler bool   `yaml:"not-found-handler"`
 }
 
@@ -26,6 +27,7 @@ func newServer() Server {
 	return Server{
 		Host:            "0.0.0.0",
 		Port:            8080,
+		HealthCheck:     false,
 		NotFoundHandler: false,
 	}
 }

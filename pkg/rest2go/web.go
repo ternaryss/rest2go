@@ -19,6 +19,10 @@ func NewServer(conf settings.Server, router *http.ServeMux, middlewares ...Middl
 		router = http.NewServeMux()
 	}
 
+	if conf.HealthCheck {
+		router.HandleFunc("GET /health", healthCheck)
+	}
+
 	if conf.NotFoundHandler {
 		router.HandleFunc("/", HandleNotFoundError)
 	}
