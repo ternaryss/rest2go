@@ -27,6 +27,12 @@ all future services.
 
 - GoLang >= 1.25.0
 
+**Installation**:
+
+```bash
+go get github.com/ternaryss/rest2go@latest
+```
+
 **Table of contents**:
 
 1. [Settings](#Settings)
