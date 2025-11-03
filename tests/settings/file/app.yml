@@ -1,0 +1,7 @@
+logs:
+  level: "debug"
+  file-enabled: true
+  max-size: 20 
+  max-age: 30
+
+foo: "testing"
