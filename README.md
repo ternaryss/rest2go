@@ -7,7 +7,7 @@
 **rest2go** is a lightweight starter for building REST API microservices in Go. Library provides complete foundation 
 (from application configuration to database connection) so you can focus on writing business logic right away.
 
-Library was created to address internal needs od **Ternary Software Solutions**. After developing several microservices 
+Library was created to address internal needs of **Ternary Software Solutions**. After developing several microservices 
 written in almost pure Go, growing amount of duplicated boilerplate code was noticed - configuration loading, HTTP setup, 
 database integration and errors handling. Each new project required additional time just to prepare repository and basic 
 code infrastructure. **rest2go** was built to solve that problem by providing reusable, consistent starting point for 
@@ -194,10 +194,12 @@ chain.
 
 ```go
 router := http.NewServeMux()
-server := &http.Server{
-  Addr:    addr,
-  Handler: Middlewares(<m1>, <m2>, ..., <mx>)(router),
-}
+server := rest2go.NewServer(
+  conf.Server,
+  router.Routes(),
+  rest2go.LogRequestAndResponseMiddleware, // First middleware
+  rest2go.ApiKeyAuthMiddleware(conf.Authorization), // Second middleware
+)
 ```
 
 ### Log request & response

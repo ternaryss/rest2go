@@ -2,6 +2,10 @@
 
 History of **rest2go** library with changes description.
 
+## Next release
+
+- `FIX` Not public HTTP server implementation
+
 ## 1.0.0 (2025-11-03)
 
 - `FEATURE` Health check
