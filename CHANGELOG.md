@@ -4,6 +4,8 @@ History of **rest2go** library with changes description.
 
 ## Next release
 
+- `FEATURE` Handle any expected HTTP error as unknown
+- `FEATURE` Handle expected HTTP 500 error
 - `FIX` Not public HTTP server implementation
 
 ## 1.0.0 (2025-11-03)
