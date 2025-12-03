@@ -101,6 +101,12 @@ func HandleError(err error, response http.ResponseWriter) {
 
 		case 406:
 			dto = NewApiErrorDto("err.not-acceptable", "Not Acceptable")
+
+		case 500:
+			dto = NewApiErrorDto("err.internal", "Internal Server Error", apiErr.Details...)
+
+		default:
+			dto = NewApiErrorDto("err.unknown", "Unknown Server Error", apiErr.Details...)
 		}
 
 		response.WriteHeader(apiErr.Status)

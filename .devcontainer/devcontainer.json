@@ -1,7 +1,7 @@
 {
 	"name": "Go",
 	"image": "mcr.microsoft.com/devcontainers/go:1.25-bookworm",
-	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y cmake ripgrep",
+	"postCreateCommand": "chmod +x .devcontainer/neovim.sh && ./.devcontainer/neovim.sh",
 	"containerEnv": {
 		"TZ": "Europe/Warsaw"
 	}

@@ -8,13 +8,13 @@ import (
 	"github.com/ternaryss/rest2go/pkg/rest2go/settings"
 )
 
-type Server struct {
+type server struct {
 	conf        settings.Server
 	router      *http.ServeMux
 	middlewares []Middleware
 }
 
-func NewServer(conf settings.Server, router *http.ServeMux, middlewares ...Middleware) *Server {
+func NewServer(conf settings.Server, router *http.ServeMux, middlewares ...Middleware) *server {
 	if router == nil {
 		router = http.NewServeMux()
 	}
@@ -27,14 +27,14 @@ func NewServer(conf settings.Server, router *http.ServeMux, middlewares ...Middl
 		router.HandleFunc("/", HandleNotFoundError)
 	}
 
-	return &Server{
+	return &server{
 		conf:        conf,
 		router:      router,
 		middlewares: middlewares,
 	}
 }
 
-func (s *Server) Run() error {
+func (s *server) Run() error {
 	addr := fmt.Sprintf("%s:%d", s.conf.Host, s.conf.Port)
 	var handler http.Handler
 
