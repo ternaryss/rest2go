@@ -2,6 +2,10 @@
 
 History of **rest2go** library with changes description.
 
+## 1.1.1 (2026-04-14)
+
+- `FIX` SQLite3 respect foreign keys
+
 ## 1.1.0 (2025-12-03)
 
 - `FEATURE` Handle any expected HTTP error as unknown
