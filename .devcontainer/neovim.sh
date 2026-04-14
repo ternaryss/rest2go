@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-VERSION="0.11.5"
+VERSION="0.11.6"
 TAG="v${VERSION}"
 
 sudo apt-get update 
-sudo apt-get install -y curl ninja-build gettext cmake unzip curl build-essential ripgrep
+sudo apt-get install -y curl ninja-build gettext cmake unzip build-essential ripgrep
 
 curl -fsL "https://github.com/neovim/neovim/archive/refs/tags/${TAG}.tar.gz" -o "/tmp/neovim-${TAG}.tar.gz"
 tar -xzf "/tmp/neovim-${TAG}.tar.gz" -C /tmp
@@ -19,4 +19,4 @@ sudo make CMAKE_INSTALL_PREFIX=/usr/local/nvim install
 sudo ln -sf /usr/local/nvim/bin/nvim /usr/local/bin/nvim
 
 cd /
-rm -rf "/tmp/neovim-${VERSION}"
+sudo rm -rf "/tmp/neovim-${VERSION}"

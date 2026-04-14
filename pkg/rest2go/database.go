@@ -87,13 +87,10 @@ func (p *dbProvider) MigrateDatabase() error {
 }
 
 func initSQLiteConnection(conf settings.Database) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", conf.Host)
+	dsn := fmt.Sprintf("%s?_foreign_keys=on", conf.Host)
+	db, err := sql.Open("sqlite3", dsn)
 
 	if err != nil {
-		return nil, err
-	}
-
-	if _, err := db.Exec("PRAGMA FOREIGN_KEYS=ON;"); err != nil {
 		return nil, err
 	}
 
