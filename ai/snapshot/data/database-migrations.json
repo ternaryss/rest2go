@@ -1,0 +1,32 @@
+{
+  "name": "Database Migrations",
+  "description": "Goose migration execution for the configured database driver using the conventional migrations directory.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "provider.MigrateDatabase()",
+      "file": "./pkg/rest2go/database.go",
+      "symbol": "MigrateDatabase"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/database.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Sets the Goose dialect and applies migrations from the driver-specific migrations directory."
+    },
+    {
+      "path": "./pkg/rest2go/settings/blocks.go",
+      "role": "configuration",
+      "priority": 2,
+      "description": "Provides the database driver value used to choose the migrations path and Goose dialect."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents the expected ./migrations/${driver} layout and application call sequence."
+    }
+  ]
+}

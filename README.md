@@ -25,7 +25,7 @@ all future services.
 
 **Requirements**:
 
-- GoLang >= 1.25.0
+- GoLang >= 1.27.1
 
 **Installation**:
 

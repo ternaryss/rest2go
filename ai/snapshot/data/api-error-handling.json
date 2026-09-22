@@ -1,0 +1,38 @@
+{
+  "name": "API Error Handling",
+  "description": "Standardized REST API error responses with field-level validation details and status-based codes.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "rest2go.HandleError(err, response)",
+      "file": "./pkg/rest2go/errors.go",
+      "symbol": "HandleError"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/errors.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Defines API error DTOs, constructors, not-found handling, and response writing."
+    },
+    {
+      "path": "./pkg/rest2go/web.go",
+      "role": "integration",
+      "priority": 2,
+      "description": "Optionally registers the global not-found handler."
+    },
+    {
+      "path": "./pkg/rest2go/middlewares.go",
+      "role": "integration",
+      "priority": 2,
+      "description": "Uses API error handling for authorization failures."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents public error JSON shape and validation error creation."
+    }
+  ]
+}

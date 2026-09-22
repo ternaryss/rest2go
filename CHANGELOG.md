@@ -2,6 +2,10 @@
 
 History of **rest2go** library with changes description.
 
+## Next release
+
+- `FEATURE` Initialize AI coding assistant (AGENTS.md and repository indexing)
+
 ## 1.1.1 (2026-04-14)
 
 - `FIX` SQLite3 respect foreign keys

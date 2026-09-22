@@ -1,0 +1,79 @@
+[
+  {
+    "id": "settings-loading",
+    "name": "Settings Loading",
+    "description": "YAML-backed configuration loading with defaults and application extension via embedded settings structs.",
+    "file": "data/settings-loading.json",
+    "keywords": ["settings", "configuration", "yaml", "defaults", "logs", "load"]
+  },
+  {
+    "id": "http-server",
+    "name": "HTTP Server",
+    "description": "Preconfigured net/http server creation with optional health and not-found handling.",
+    "file": "data/http-server.json",
+    "keywords": ["http", "server", "servemux", "routes", "health", "not-found"]
+  },
+  {
+    "id": "middleware-chain",
+    "name": "Middleware Chain",
+    "description": "Middleware composition around HTTP handlers.",
+    "file": "data/middleware-chain.json",
+    "keywords": ["middleware", "chain", "composition", "handler"]
+  },
+  {
+    "id": "request-response-logging",
+    "name": "Request/Response Logging",
+    "description": "HTTP middleware that logs incoming requests and outgoing responses.",
+    "file": "data/request-response-logging.json",
+    "keywords": ["middleware", "logging", "request", "response", "slog", "uuid"]
+  },
+  {
+    "id": "api-key-authorization",
+    "name": "API Key Authorization",
+    "description": "Api-Key header authorization with configurable public ant-style URL patterns.",
+    "file": "data/api-key-authorization.json",
+    "keywords": ["authorization", "api-key", "header", "public", "pattern"]
+  },
+  {
+    "id": "pagination",
+    "name": "Pagination",
+    "description": "Pagination calculation and page DTO helpers for REST result sets.",
+    "file": "data/pagination.json",
+    "keywords": ["pagination", "page", "limit", "offset", "dto"]
+  },
+  {
+    "id": "filtering",
+    "name": "Filtering",
+    "description": "Filter structure and safe sort parsing for REST result-set queries.",
+    "file": "data/filtering.json",
+    "keywords": ["filter", "sort", "query", "prefix", "sql"]
+  },
+  {
+    "id": "api-error-handling",
+    "name": "API Error Handling",
+    "description": "Standard API error DTOs, field errors, and HTTP error response writing.",
+    "file": "data/api-error-handling.json",
+    "keywords": ["error", "api", "dto", "field", "response", "not-found"]
+  },
+  {
+    "id": "health-check",
+    "name": "Health Check",
+    "description": "GET /health endpoint that returns runtime, CPU, memory, and uptime statistics.",
+    "file": "data/health-check.json",
+    "keywords": ["health", "runtime", "cpu", "memory", "uptime"]
+  },
+  {
+    "id": "database-connection",
+    "name": "Database Connection",
+    "description": "Database provider initialization for SQLite and Postgres plus transaction context helpers.",
+    "file": "data/database-connection.json",
+    "keywords": ["database", "sqlite", "postgres", "provider", "transaction", "sql"]
+  },
+  {
+    "id": "database-migrations",
+    "name": "Database Migrations",
+    "description": "Goose migration execution using the configured database driver and migrations directory.",
+    "file": "data/database-migrations.json",
+    "keywords": ["database", "migration", "goose", "migrations", "driver"]
+  }
+]

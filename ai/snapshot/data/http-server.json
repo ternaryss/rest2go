@@ -1,0 +1,38 @@
+{
+  "name": "HTTP Server",
+  "description": "Preconfigured net/http server setup for applications that provide a ServeMux and optional middlewares.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "rest2go.NewServer(...).Run()",
+      "file": "./pkg/rest2go/web.go",
+      "symbol": "NewServer"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/web.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Creates the server, registers optional built-in routes, applies middleware, and starts ListenAndServe."
+    },
+    {
+      "path": "./pkg/rest2go/settings/blocks.go",
+      "role": "configuration",
+      "priority": 2,
+      "description": "Defines server host, port, health check, and not-found handler settings."
+    },
+    {
+      "path": "./pkg/rest2go/middlewares.go",
+      "role": "supporting-flow",
+      "priority": 2,
+      "description": "Provides middleware composition used when the server is run."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents expected server usage with http.ServeMux and settings."
+    }
+  ]
+}

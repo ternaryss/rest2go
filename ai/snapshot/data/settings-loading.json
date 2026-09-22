@@ -1,0 +1,38 @@
+{
+  "name": "Settings Loading",
+  "description": "YAML-backed configuration loading with built-in defaults, logging setup, and support for application-specific settings through embedding.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "settings.Load[T]()",
+      "file": "./pkg/rest2go/settings/settings.go",
+      "symbol": "Load"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/settings/settings.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Loads defaults, reads app.yml/configs/app.yml, configures slog, and caches the settings instance."
+    },
+    {
+      "path": "./pkg/rest2go/settings/blocks.go",
+      "role": "configuration-models",
+      "priority": 2,
+      "description": "Defines YAML blocks and default values for logs, server, authorization, and database settings."
+    },
+    {
+      "path": "./tests/settings/",
+      "role": "tests",
+      "priority": 3,
+      "description": "Covers default, embedded, file-based, and invalid settings loading scenarios."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents settings YAML shape, defaults, embedding pattern, and logging configuration behavior."
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-VERSION="0.11.6"
+VERSION="0.12.5"
 TAG="v${VERSION}"
 
-sudo apt-get update 
+sudo apt-get update
 sudo apt-get install -y curl ninja-build gettext cmake unzip build-essential ripgrep
 
 curl -fsL "https://github.com/neovim/neovim/archive/refs/tags/${TAG}.tar.gz" -o "/tmp/neovim-${TAG}.tar.gz"
