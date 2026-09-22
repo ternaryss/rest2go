@@ -4,6 +4,7 @@ History of **rest2go** library with changes description.
 
 ## Next release
 
+- `FIX` Ant Pattern matching for ApiKeyAuthMiddleware
 - `FEATURE` Initialize AI coding assistant (AGENTS.md and repository indexing)
 
 ## 1.1.1 (2026-04-14)
