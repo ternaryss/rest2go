@@ -4,7 +4,8 @@ History of **rest2go** library with changes description.
 
 ## Next release
 
-- `FEATURE` More visible HTTP request logging
+- `FEATURE` More visible HTTP response log and processing duration
+- `FEATURE` More visible HTTP request log
 - `FEATURE` Database handling refactor
 - `FIX` Ant Pattern matching for ApiKeyAuthMiddleware
 - `FEATURE` Initialize AI coding assistant (AGENTS.md and repository indexing)

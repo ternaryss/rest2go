@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/ternaryss/rest2go/pkg/rest2go/settings"
@@ -29,6 +30,7 @@ func Middlewares(middlewares ...Middleware) Middleware {
 func LogRequestAndResponseMiddleware(next http.Handler) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		var body []byte
+		start := time.Now()
 		uid := uuid.NewString()
 		reqContentType := request.Header.Get("Content-Type")
 
@@ -41,12 +43,16 @@ func LogRequestAndResponseMiddleware(next http.Handler) http.HandlerFunc {
 		writer := newLogResponseWriter(response)
 		next.ServeHTTP(writer, request)
 		resContentType := writer.Header().Get("Content-Type")
+		duration := time.Since(start)
 
 		switch resContentType {
 		case "application/json":
-			slog.Info("HTTP Response", "uid", uid, "status", writer.status, "body", writer.body.String())
+			slog.Info(
+				"[HTTP RESPONSE]", "uid", uid, "duration", duration.String(), "status", writer.status,
+				"body", writer.body.String(),
+			)
 		default:
-			slog.Info("HTTP Response", "uid", uid, "status", writer.status)
+			slog.Info("[HTTP RESPONSE]", "uid", uid, "duration", duration.String(), "status", writer.status)
 		}
 	}
 }
