@@ -14,7 +14,7 @@ type logResponseWriter struct {
 func newLogResponseWriter(writer http.ResponseWriter) *logResponseWriter {
 	return &logResponseWriter{
 		ResponseWriter: writer,
-		status:         -1,
+		status:         http.StatusOK,
 		body:           bytes.NewBuffer(nil),
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/google/uuid"
@@ -17,8 +18,8 @@ type Middleware func(http.Handler) http.HandlerFunc
 
 func Middlewares(middlewares ...Middleware) Middleware {
 	return func(next http.Handler) http.HandlerFunc {
-		for i := len(middlewares) - 1; i >= 0; i-- {
-			next = middlewares[i](next)
+		for _, middleware := range slices.Backward(middlewares) {
+			next = middleware(next)
 		}
 
 		return next.ServeHTTP
@@ -28,7 +29,7 @@ func Middlewares(middlewares ...Middleware) Middleware {
 func LogRequestAndResponseMiddleware(next http.Handler) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		var body []byte
-		uid := uuid.New().String()
+		uid := uuid.NewString()
 		reqContentType := request.Header.Get("Content-Type")
 
 		if strings.Contains(reqContentType, "application/json") {
@@ -36,7 +37,7 @@ func LogRequestAndResponseMiddleware(next http.Handler) http.HandlerFunc {
 			request.Body = io.NopCloser(bytes.NewBuffer(body))
 		}
 
-		slog.Info("HTTP Request", "uid", uid, "method", request.Method, "path", request.RequestURI, "body", body)
+		slog.Info("[HTTP REQUEST]", "uid", uid, "method", request.Method, "path", request.RequestURI, "body", string(body))
 		writer := newLogResponseWriter(response)
 		next.ServeHTTP(writer, request)
 		resContentType := writer.Header().Get("Content-Type")
