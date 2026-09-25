@@ -43,8 +43,9 @@ go get github.com/ternaryss/rest2go@latest
 6. [Filtering](#Filtering)
 7. [Errors handling](#Errors-handling)
 8. [Health check](#Health-check)
-9. [Database connection](#Database-connection)
-10. [Database migrations](#Database-migrations)
+9. [Configuration API](#Configuration-API)
+10. [Database connection](#Database-connection)
+11. [Database migrations](#Database-migrations)
 
 ## Settings
 
@@ -77,6 +78,8 @@ server:
   host: "0.0.0.0"
   # HTTP server port
   port: 8080
+  # Indicates if configuration API is available
+  configuration: false
   # Indicates if health check is available
   health-check: false
   # Indicates if global HTTP 404 should be handled by rest2go errors handler
@@ -378,6 +381,82 @@ statistics.
   "memoryAvailable": 1024.0, // Available RAM (MB)
   "memoryTotal": 16384.0, // Total RAM (MB)
   "routines": 10 // Quantity of Go routines
+}
+```
+
+## Configuration API
+
+`rest2go` provides optional configuration API functionality. When `HTTP server` is configured to serve `GET /config`
+(configuration described in [Settings](#Settings) chapter), application using library can expose currently loaded
+configuration as JSON.
+
+Configuration API is disabled by default. To enable it, set:
+
+```yaml
+server:
+  configuration: true
+```
+
+Application has to pass loaded configuration explicitly:
+
+```go
+settings, err := settings.Load[settings.Settings]()
+
+if err != nil {
+  // Handle error
+}
+
+router := http.NewServeMux()
+server := rest2go.NewServer(settings.Server, router).WithFetchConfig(settings)
+
+if err := server.Run(); err != nil {
+  // Handle error
+}
+```
+
+Fields marked with `json:"-"` are not returned in the response. Built-in sensitive fields such as authorization key and
+database password are omitted from JSON response.
+
+Application-specific sensitive fields should also be marked with `json:"-"`:
+
+```go
+type AppSettings struct {
+  settings.Settings `yaml:",inline"`
+  Secret            string `yaml:"secret" json:"-"`
+}
+```
+
+Example response:
+
+```json
+{
+  "logs": {
+    "level": "info",
+    "fileEnabled": false,
+    "maxSize": 10,
+    "maxAge": 7
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "configuration": true,
+    "healthCheck": false,
+    "notFoundHandler": false
+  },
+  "authorization": {
+    "header": {
+      "enabled": false,
+      "public": []
+    }
+  },
+  "database": {
+    "driver": "sqlite3",
+    "host": "./data/app.db",
+    "port": 0,
+    "user": "",
+    "name": "",
+    "schema": ""
+  }
 }
 ```
 

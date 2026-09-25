@@ -9,9 +9,9 @@
   {
     "id": "http-server",
     "name": "HTTP Server",
-    "description": "Preconfigured net/http server creation with optional health and not-found handling.",
+    "description": "Preconfigured net/http server creation with optional built-in routes and not-found handling.",
     "file": "data/http-server.json",
-    "keywords": ["http", "server", "servemux", "routes", "health", "not-found"]
+    "keywords": ["http", "server", "servemux", "routes", "health", "config", "not-found"]
   },
   {
     "id": "middleware-chain",
@@ -61,6 +61,13 @@
     "description": "GET /health endpoint that returns runtime, CPU, memory, and uptime statistics.",
     "file": "data/health-check.json",
     "keywords": ["health", "runtime", "cpu", "memory", "uptime"]
+  },
+  {
+    "id": "configuration-api",
+    "name": "Configuration API",
+    "description": "Optional GET /config endpoint that returns the loaded microservice configuration as JSON.",
+    "file": "data/configuration-api.json",
+    "keywords": ["configuration", "config", "settings", "json", "endpoint"]
   },
   {
     "id": "database-connection",

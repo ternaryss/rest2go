@@ -20,7 +20,7 @@
       "path": "./pkg/rest2go/settings/blocks.go",
       "role": "configuration-models",
       "priority": 2,
-      "description": "Defines YAML blocks and default values for logs, server, authorization, and database settings."
+      "description": "Defines YAML blocks, JSON exposure tags, and default values for logs, server, authorization, and database settings."
     },
     {
       "path": "./tests/settings/",
