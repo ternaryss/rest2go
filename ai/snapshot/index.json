@@ -65,9 +65,9 @@
   {
     "id": "database-connection",
     "name": "Database Connection",
-    "description": "Database provider initialization for SQLite and Postgres plus transaction context helpers.",
+    "description": "Database helper initialization for SQLite and Postgres plus query and transaction helpers.",
     "file": "data/database-connection.json",
-    "keywords": ["database", "sqlite", "postgres", "provider", "transaction", "sql"]
+    "keywords": ["database", "sqlite", "postgres", "transaction", "query", "sql"]
   },
   {
     "id": "database-migrations",

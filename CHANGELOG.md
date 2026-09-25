@@ -4,6 +4,7 @@ History of **rest2go** library with changes description.
 
 ## Next release
 
+- `FEATURE` Database handling refactor
 - `FIX` Ant Pattern matching for ApiKeyAuthMiddleware
 - `FEATURE` Initialize AI coding assistant (AGENTS.md and repository indexing)
 

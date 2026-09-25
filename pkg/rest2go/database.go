@@ -2,6 +2,7 @@ package rest2go
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -9,86 +10,111 @@ import (
 	"github.com/ternaryss/rest2go/pkg/rest2go/settings"
 )
 
-var (
-	loadOnce sync.Once
-	cached   *dbProvider
-	initErr  error
+const (
+	DbSQLite   string = "sqlite3"
+	DbPostgres string = "postgres"
 )
 
-type DbCtx struct {
-	Tx *sql.Tx
-}
+var (
+	loadOnce sync.Once
+	cached   *Database
+	dbErr    error
+)
 
-func NewDbContext(tx *sql.Tx) *DbCtx {
-	return &DbCtx{Tx: tx}
-}
-
-type DbStore interface {
-	Begin() (*DbCtx, error)
-	Commit(context *DbCtx) error
-	Rollback(context *DbCtx) error
-}
-
-type dbProvider struct {
+type Database struct {
 	conf settings.Database
-	db   *sql.DB
+	Pool *sql.DB
 }
 
-func NewDbProvider(conf settings.Database) (*dbProvider, error) {
+func NewDatabase(conf settings.Database) (*Database, error) {
 	loadOnce.Do(func() {
-		var db *sql.DB
+		var pool *sql.DB
 
 		switch conf.Driver {
-		case "sqlite3":
-			db, initErr = initSQLiteConnection(conf)
+		case DbSQLite:
+			pool, dbErr = initSQLite(conf)
 
-		case "postgres":
-			db, initErr = initPostgresConnection(conf)
+		case DbPostgres:
+			pool, dbErr = initPostgres(conf)
 
 		default:
-			initErr = fmt.Errorf("unsupported database driver: %s", conf.Driver)
+			dbErr = fmt.Errorf("unsupported database driver: %s", conf.Driver)
+			return
 		}
 
-		if initErr == nil {
-			cached = &dbProvider{
-				conf: conf,
-				db:   db,
-			}
+		if dbErr == nil {
+			cached = &Database{conf: conf, Pool: pool}
 		}
 	})
 
-	if initErr != nil {
-		return nil, initErr
-	}
-
-	return cached, nil
+	return cached, dbErr
 }
 
-func (p *dbProvider) Db() *sql.DB {
-	return p.db
+func (d *Database) Close() error {
+	return d.Pool.Close()
 }
 
-func (p *dbProvider) CloseConnection() error {
-	return p.db.Close()
-}
+func (d *Database) Migrate() error {
+	migrations := fmt.Sprintf("./migrations/%s", d.conf.Driver)
 
-func (p *dbProvider) MigrateDatabase() error {
-	migrations := fmt.Sprintf("./migrations/%s", p.conf.Driver)
-
-	if err := goose.SetDialect(p.conf.Driver); err != nil {
+	if err := goose.SetDialect(d.conf.Driver); err != nil {
 		return err
 	}
 
-	if err := goose.Up(p.db, migrations); err != nil {
+	if err := goose.Up(d.Pool, migrations); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func initSQLiteConnection(conf settings.Database) (*sql.DB, error) {
+func (d *Database) Begin() (*sql.Tx, error) {
+	return d.Pool.Begin()
+}
+
+func (d *Database) Commit(tx *sql.Tx) error {
+	if tx == nil {
+		return errors.New("nil transaction")
+	}
+
+	return tx.Commit()
+}
+
+func (d *Database) Rollback(tx *sql.Tx) error {
+	if tx == nil {
+		return errors.New("nil transaction")
+	}
+
+	return tx.Rollback()
+}
+
+func (d *Database) Exec(tx *sql.Tx, query string, args ...any) (sql.Result, error) {
+	if tx != nil {
+		return tx.Exec(query, args...)
+	}
+
+	return d.Pool.Exec(query, args...)
+}
+
+func (d *Database) Query(tx *sql.Tx, query string, args ...any) (*sql.Rows, error) {
+	if tx != nil {
+		return tx.Query(query, args...)
+	}
+
+	return d.Pool.Query(query, args...)
+}
+
+func (d *Database) QueryRow(tx *sql.Tx, query string, args ...any) *sql.Row {
+	if tx != nil {
+		return tx.QueryRow(query, args...)
+	}
+
+	return d.Pool.QueryRow(query, args...)
+}
+
+func initSQLite(conf settings.Database) (*sql.DB, error) {
 	dsn := fmt.Sprintf("%s?_foreign_keys=on", conf.Host)
-	db, err := sql.Open("sqlite3", dsn)
+	db, err := sql.Open(DbSQLite, dsn)
 
 	if err != nil {
 		return nil, err
@@ -101,7 +127,7 @@ func initSQLiteConnection(conf settings.Database) (*sql.DB, error) {
 	return db, nil
 }
 
-func initPostgresConnection(conf settings.Database) (*sql.DB, error) {
+func initPostgres(conf settings.Database) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%d/%s?sslmode=disable&search_path=%s",
 		conf.User,
@@ -111,7 +137,7 @@ func initPostgresConnection(conf settings.Database) (*sql.DB, error) {
 		conf.Name,
 		conf.Schema,
 	)
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open(DbPostgres, dsn)
 
 	if err != nil {
 		return nil, err

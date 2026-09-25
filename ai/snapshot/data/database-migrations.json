@@ -4,9 +4,9 @@
   "entrypoints": [
     {
       "type": "library-api",
-      "path": "provider.MigrateDatabase()",
+      "path": "database.Migrate()",
       "file": "./pkg/rest2go/database.go",
-      "symbol": "MigrateDatabase"
+      "symbol": "Migrate"
     }
   ],
   "files": [
@@ -26,7 +26,7 @@
       "path": "./README.md",
       "role": "documentation",
       "priority": 3,
-      "description": "Documents the expected ./migrations/${driver} layout and application call sequence."
+      "description": "Documents the expected ./migrations/${driver} layout and Database migration call sequence."
     }
   ]
 }

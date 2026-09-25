@@ -1,12 +1,12 @@
 {
   "name": "Database Connection",
-  "description": "Database provider setup for SQLite and Postgres plus transaction context helpers for application stores.",
+  "description": "Database helper setup for SQLite and Postgres plus direct query and transaction helpers for application stores.",
   "entrypoints": [
     {
       "type": "library-api",
-      "path": "rest2go.NewDbProvider(settings.Database)",
+      "path": "rest2go.NewDatabase(settings.Database)",
       "file": "./pkg/rest2go/database.go",
-      "symbol": "NewDbProvider"
+      "symbol": "NewDatabase"
     }
   ],
   "files": [
@@ -14,7 +14,7 @@
       "path": "./pkg/rest2go/database.go",
       "role": "main-flow",
       "priority": 1,
-      "description": "Initializes the configured database driver, exposes the DB handle, and defines transaction context/store contracts."
+      "description": "Initializes the configured database driver, exposes the SQL pool, and provides transaction/query helpers."
     },
     {
       "path": "./pkg/rest2go/settings/blocks.go",
@@ -26,7 +26,7 @@
       "path": "./README.md",
       "role": "documentation",
       "priority": 3,
-      "description": "Documents SQLite/Postgres configuration and provider usage from applications."
+      "description": "Documents SQLite/Postgres configuration, database initialization, store usage, and transactions."
     }
   ]
 }
