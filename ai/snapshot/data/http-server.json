@@ -20,7 +20,7 @@
       "path": "./pkg/rest2go/settings/blocks.go",
       "role": "configuration",
       "priority": 2,
-      "description": "Defines server host, port, health check, and not-found handler settings."
+      "description": "Defines server host, port, optional built-in route flags, and not-found handler settings."
     },
     {
       "path": "./pkg/rest2go/middlewares.go",

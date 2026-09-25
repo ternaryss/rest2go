@@ -4,6 +4,7 @@ History of **rest2go** library with changes description.
 
 ## Next release
 
+- `FEATURE` REST API for fetching actual configuration
 - `FEATURE` More visible HTTP response log and processing duration
 - `FEATURE` More visible HTTP request log
 - `FEATURE` Database handling refactor
