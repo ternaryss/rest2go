@@ -2,6 +2,15 @@
 
 History of **rest2go** library with changes description.
 
+## 1.2.0 (2026-09-27)
+
+- `FEATURE` REST API for fetching actual configuration
+- `FEATURE` More visible HTTP response log and processing duration
+- `FEATURE` More visible HTTP request log
+- `FEATURE` Database handling refactor
+- `FIX` Ant Pattern matching for ApiKeyAuthMiddleware
+- `FEATURE` Initialize AI coding assistant (AGENTS.md and repository indexing)
+
 ## 1.1.1 (2026-04-14)
 
 - `FIX` SQLite3 respect foreign keys

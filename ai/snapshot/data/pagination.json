@@ -1,0 +1,26 @@
+{
+  "name": "Pagination",
+  "description": "Helpers for calculating pagination metadata and returning typed page DTOs from REST endpoints.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "rest2go.NewPagination(page, size, all)",
+      "file": "./pkg/rest2go/pagination.go",
+      "symbol": "NewPagination"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/pagination.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Calculates pages, limit, offset, and exposes page DTO helpers."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Shows intended REST query usage and response JSON shape."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "API Key Authorization",
+  "description": "Basic Api-Key header authorization middleware with configurable public URL patterns.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "rest2go.ApiKeyAuthMiddleware(settings.Authorization)",
+      "file": "./pkg/rest2go/middlewares.go",
+      "symbol": "ApiKeyAuthMiddleware"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/middlewares.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Checks public patterns and validates the Api-Key header when authorization is enabled."
+    },
+    {
+      "path": "./pkg/rest2go/patterns.go",
+      "role": "supporting-helper",
+      "priority": 2,
+      "description": "Converts ant-style public URL patterns into regular expressions."
+    },
+    {
+      "path": "./pkg/rest2go/errors.go",
+      "role": "error-response",
+      "priority": 2,
+      "description": "Writes unauthorized API responses when header validation fails."
+    },
+    {
+      "path": "./pkg/rest2go/settings/blocks.go",
+      "role": "configuration",
+      "priority": 3,
+      "description": "Defines authorization header settings, key, and public patterns."
+    }
+  ]
+}

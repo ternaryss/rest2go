@@ -1,0 +1,38 @@
+{
+  "name": "Request/Response Logging",
+  "description": "HTTP middleware that logs request metadata, optional JSON request body, and response status/body for a single REST call.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "rest2go.LogRequestAndResponseMiddleware",
+      "file": "./pkg/rest2go/middlewares.go",
+      "symbol": "LogRequestAndResponseMiddleware"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/middlewares.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Logs request and response details around the next HTTP handler."
+    },
+    {
+      "path": "./pkg/rest2go/writers.go",
+      "role": "supporting-helper",
+      "priority": 2,
+      "description": "Captures response status and body for logging."
+    },
+    {
+      "path": "./pkg/rest2go/settings/settings.go",
+      "role": "logging-configuration",
+      "priority": 3,
+      "description": "Configures the default slog handler used by logging middleware output."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents request/response logging middleware behavior."
+    }
+  ]
+}

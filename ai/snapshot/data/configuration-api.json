@@ -1,0 +1,38 @@
+{
+  "name": "Configuration API",
+  "description": "Optional endpoint for exposing the currently loaded microservice configuration as JSON.",
+  "entrypoints": [
+    {
+      "type": "http",
+      "path": "GET /config",
+      "file": "./pkg/rest2go/web.go",
+      "symbol": "WithFetchConfig"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/web.go",
+      "role": "registration",
+      "priority": 1,
+      "description": "Registers the optional configuration route when enabled and receives the configuration object to expose."
+    },
+    {
+      "path": "./pkg/rest2go/settings/blocks.go",
+      "role": "configuration",
+      "priority": 2,
+      "description": "Defines the server flag for enabling configuration API and JSON visibility of built-in settings fields."
+    },
+    {
+      "path": "./pkg/rest2go/settings/settings.go",
+      "role": "settings-source",
+      "priority": 2,
+      "description": "Loads the configuration instance that applications pass to the configuration API."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents enabling, usage, response shape, and omission of sensitive JSON fields."
+    }
+  ]
+}

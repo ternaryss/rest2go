@@ -25,7 +25,7 @@ all future services.
 
 **Requirements**:
 
-- GoLang >= 1.25.0
+- GoLang >= 1.27.1
 
 **Installation**:
 
@@ -43,8 +43,9 @@ go get github.com/ternaryss/rest2go@latest
 6. [Filtering](#Filtering)
 7. [Errors handling](#Errors-handling)
 8. [Health check](#Health-check)
-9. [Database connection](#Database-connection)
-10. [Database migrations](#Database-migrations)
+9. [Configuration API](#Configuration-API)
+10. [Database connection](#Database-connection)
+11. [Database migrations](#Database-migrations)
 
 ## Settings
 
@@ -77,6 +78,8 @@ server:
   host: "0.0.0.0"
   # HTTP server port
   port: 8080
+  # Indicates if configuration API is available
+  configuration: false
   # Indicates if health check is available
   health-check: false
   # Indicates if global HTTP 404 should be handled by rest2go errors handler
@@ -381,12 +384,20 @@ statistics.
 }
 ```
 
-## Database connection
+## Configuration API
 
-`rest2go` provides utilities to initialize database connection. All available settings are described in 
-[Settings](#Settings) chapter. Supported drivers are described below. Idea behind this is to provide database driver 
-from parent application (`blank import` in `main.go`) and use it with set of tools provided by library. First of all, 
-there is database connection provider that works as singleton:
+`rest2go` provides optional configuration API functionality. When `HTTP server` is configured to serve `GET /config`
+(configuration described in [Settings](#Settings) chapter), application using library can expose currently loaded
+configuration as JSON.
+
+Configuration API is disabled by default. To enable it, set:
+
+```yaml
+server:
+  configuration: true
+```
+
+Application has to pass loaded configuration explicitly:
 
 ```go
 settings, err := settings.Load[settings.Settings]()
@@ -395,65 +406,189 @@ if err != nil {
   // Handle error
 }
 
-provider, err := rest2go.NewDbProvider(settings.Database)
+router := http.NewServeMux()
+server := rest2go.NewServer(settings.Server, router).WithFetchConfig(settings)
+
+if err := server.Run(); err != nil {
+  // Handle error
+}
+```
+
+Fields marked with `json:"-"` are not returned in the response. Built-in sensitive fields such as authorization key and
+database password are omitted from JSON response.
+
+Application-specific sensitive fields should also be marked with `json:"-"`:
+
+```go
+type AppSettings struct {
+  settings.Settings `yaml:",inline"`
+  Secret            string `yaml:"secret" json:"-"`
+}
+```
+
+Example response:
+
+```json
+{
+  "logs": {
+    "level": "info",
+    "fileEnabled": false,
+    "maxSize": 10,
+    "maxAge": 7
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "configuration": true,
+    "healthCheck": false,
+    "notFoundHandler": false
+  },
+  "authorization": {
+    "header": {
+      "enabled": false,
+      "public": []
+    }
+  },
+  "database": {
+    "driver": "sqlite3",
+    "host": "./data/app.db",
+    "port": 0,
+    "user": "",
+    "name": "",
+    "schema": ""
+  }
+}
+```
+
+## Database connection
+
+`rest2go` provides a small database helper around Go standard `database/sql` package. All available settings are 
+described in [Settings](#Settings) chapter. Supported drivers are described below. Application is responsible for 
+providing database driver, usually with `blank import` in `main.go`:
+
+```go
+import (
+  _ "github.com/mattn/go-sqlite3"
+)
+```
+
+Database connection can be initialized from loaded settings. It works as singleton:
+
+```go
+settings, err := settings.Load[settings.Settings]()
 
 if err != nil {
   // Handle error
 }
 
-defer provider.CloseConnection()
+database, err := rest2go.NewDatabase(settings.Database)
+
+if err != nil {
+  // Handle error
+}
+
+defer database.Close()
 ```
 
-After initialization, stores can be created. Every store should implement interface visible below:
+Underlying `*sql.DB` connection pool is available through `Pool` field when direct access to `database/sql` is needed:
 
 ```go
-// Interface
-type DbStore interface {
-	Begin() (*DbCtx, error)
-	Commit(context *DbCtx) error
-	Rollback(context *DbCtx) error
-}
+database.Pool.SetMaxOpenConns(10)
+database.Pool.SetMaxIdleConns(5)
+```
 
-// Implementation
+For regular queries, prefer using helper methods exposed by `Database`:
+
+```go
+database.Exec(tx, query, args...)
+database.Query(tx, query, args...)
+database.QueryRow(tx, query, args...)
+```
+
+First argument is optional `*sql.Tx`. If it is `nil`, query is executed through main connection pool. If it is not
+`nil`, query is executed inside provided transaction.
+
+After initialization, stores can be created as follows. Examples below use `*sql.Tx` from `database/sql`:
+
+```go
 type vehiclesStore struct {
-  db *sql.DB
+  db *rest2go.Database
 }
 
-func NewVehiclesStore(db *sql.DB) *vehiclesStore {
-  return &vehiclesStore{
-    db: db,
-  }
+func NewVehiclesStore(db *rest2go.Database) *vehiclesStore {
+  return &vehiclesStore{db: db}
 }
 
-func (s *vehiclesStore) Begin() (*rest2go.DbCtx, error) {
-  tx, err := s.db.Begin()
+func (s *vehiclesStore) GetByID(id string, tx *sql.Tx) (*Vehicle, error) {
+  var vehicle Vehicle
+
+  err := s.db.QueryRow(
+    tx,
+    `SELECT ID, NAME FROM VEHICLES WHERE ID = $1`,
+    id,
+  ).Scan(
+    &vehicle.ID,
+    &vehicle.Name,
+  )
 
   if err != nil {
     return nil, err
   }
 
-  return rest2go.NewDbContext(tx), nil
+  return &vehicle, nil
 }
 
-func (s *vehiclesStore) Commit(context *rest2go.DbCtx) error {
-  if err := context.Tx.Commit(); err != nil {
-    return err
-  }
+func (s *vehiclesStore) Insert(vehicle *Vehicle, tx *sql.Tx) error {
+  _, err := s.db.Exec(
+    tx,
+    `INSERT INTO VEHICLES (ID, NAME) VALUES ($1, $2)`,
+    vehicle.ID,
+    vehicle.Name,
+  )
 
-  return nil
-}
-
-func (s *vehiclesStore) Rollback(context *rest2go.DbCtx) error {
-  if err := context.Tx.Rollback(); err != nil {
-    return err
-  }
-
-  return nil
+  return err
 }
 ```
 
-`db` for store can be obtained from `provider` with call `provider.Db()`. By default, library is configured to handle 
-SQLite database that exists in `./data/app.db`.
+Usage without transaction:
+
+```go
+vehiclesStore := NewVehiclesStore(database)
+
+vehicle, err := vehiclesStore.GetByID(id, nil)
+
+if err != nil {
+  // Handle error
+}
+```
+
+Usage with transaction:
+
+```go
+tx, err := database.Begin()
+
+if err != nil {
+  // Handle error
+}
+
+defer database.Rollback(tx)
+
+vehicle, err := vehiclesStore.GetByID(id, tx)
+
+if err != nil {
+  // Handle error
+}
+
+if err := vehiclesStore.Insert(vehicle, tx); err != nil {
+  // Handle error
+}
+
+if err := database.Commit(tx); err != nil {
+  // Handle error
+}
+```
+
+By default, library is configured to handle SQLite database that exists in `./data/app.db`.
 
 ### SQLite
 
@@ -495,15 +630,15 @@ if err != nil {
   // Handle error
 }
 
-provider, err := rest2go.NewDbProvider(settings.Database)
+database, err := rest2go.NewDatabase(settings.Database)
 
 if err != nil {
   // Handle error
 }
 
-defer provider.CloseConnection()
+defer database.Close()
 
-if err := provider.MigrateDatabase(); err != nil {
+if err := database.Migrate(); err != nil {
   // Handle error
 }
 ```

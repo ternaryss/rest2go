@@ -1,6 +1,7 @@
 package rest2go
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -32,6 +33,25 @@ func NewServer(conf settings.Server, router *http.ServeMux, middlewares ...Middl
 		router:      router,
 		middlewares: middlewares,
 	}
+}
+
+func (s *server) WithFetchConfig(config any) *server {
+	if s.conf.Configuration {
+		s.router.HandleFunc("GET /config", func(response http.ResponseWriter, request *http.Request) {
+			jsonBytes, err := json.Marshal(config)
+
+			if err != nil {
+				HandleError(err, response)
+				return
+			}
+
+			response.Header().Set("Content-Type", "application/json")
+			response.WriteHeader(http.StatusOK)
+			response.Write(jsonBytes)
+		})
+	}
+
+	return s
 }
 
 func (s *server) Run() error {

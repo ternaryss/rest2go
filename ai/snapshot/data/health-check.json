@@ -1,0 +1,38 @@
+{
+  "name": "Health Check",
+  "description": "Optional health endpoint returning basic application runtime and system statistics.",
+  "entrypoints": [
+    {
+      "type": "http",
+      "path": "GET /health",
+      "file": "./pkg/rest2go/health.go",
+      "symbol": "healthCheck"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/health.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Collects CPU, memory, uptime, Go version, and goroutine statistics for the health response."
+    },
+    {
+      "path": "./pkg/rest2go/web.go",
+      "role": "registration",
+      "priority": 2,
+      "description": "Registers GET /health when enabled by server settings."
+    },
+    {
+      "path": "./pkg/rest2go/settings/blocks.go",
+      "role": "configuration",
+      "priority": 3,
+      "description": "Defines the health-check setting in server configuration."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents the health response shape and enabling behavior."
+    }
+  ]
+}

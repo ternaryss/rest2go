@@ -1,0 +1,32 @@
+{
+  "name": "Middleware Chain",
+  "description": "Composable HTTP middleware chain for applying cross-cutting handlers around application routes.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "rest2go.Middlewares(...)",
+      "file": "./pkg/rest2go/middlewares.go",
+      "symbol": "Middlewares"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/middlewares.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Defines middleware shape and composition order."
+    },
+    {
+      "path": "./pkg/rest2go/web.go",
+      "role": "integration",
+      "priority": 2,
+      "description": "Applies middleware chains to the configured router before serving."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents middleware chain usage with server setup."
+    }
+  ]
+}

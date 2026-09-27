@@ -24,10 +24,10 @@ type Defaults interface {
 }
 
 type Settings struct {
-	Logs          Logs          `yaml:"logs"`
-	Server        Server        `yaml:"server"`
-	Authorization Authorization `yaml:"authorization"`
-	Database      Database      `yaml:"database"`
+	Logs          Logs          `yaml:"logs" json:"logs"`
+	Server        Server        `yaml:"server" json:"server"`
+	Authorization Authorization `yaml:"authorization" json:"authorization"`
+	Database      Database      `yaml:"database" json:"database"`
 }
 
 func (s *Settings) SetDefaults() {

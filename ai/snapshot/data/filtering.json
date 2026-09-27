@@ -1,0 +1,26 @@
+{
+  "name": "Filtering",
+  "description": "Filter container and sort parser for REST list endpoints using query parameters.",
+  "entrypoints": [
+    {
+      "type": "library-api",
+      "path": "rest2go.NewFilter(prefix, defaultSort, query, availableSort)",
+      "file": "./pkg/rest2go/filter.go",
+      "symbol": "NewFilter"
+    }
+  ],
+  "files": [
+    {
+      "path": "./pkg/rest2go/filter.go",
+      "role": "main-flow",
+      "priority": 1,
+      "description": "Builds filter state and validates sortable fields/directions before producing sort clauses."
+    },
+    {
+      "path": "./README.md",
+      "role": "documentation",
+      "priority": 3,
+      "description": "Documents URL query conventions, sortable fields, default sort, and prefix usage."
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 package settings
 
 type Logs struct {
-	Level       string `yaml:"level"`
-	FileEnabled bool   `yaml:"file-enabled"`
-	MaxSize     int    `yaml:"max-size"`
-	MaxAge      int    `yaml:"max-age"`
+	Level       string `yaml:"level" json:"level"`
+	FileEnabled bool   `yaml:"file-enabled" json:"fileEnabled"`
+	MaxSize     int    `yaml:"max-size" json:"maxSize"`
+	MaxAge      int    `yaml:"max-age" json:"maxAge"`
 }
 
 func newLogs() Logs {
@@ -17,25 +17,27 @@ func newLogs() Logs {
 }
 
 type Server struct {
-	Host            string `yaml:"host"`
-	Port            int    `yaml:"port"`
-	HealthCheck     bool   `yaml:"health-check"`
-	NotFoundHandler bool   `yaml:"not-found-handler"`
+	Host            string `yaml:"host" json:"host"`
+	Port            int    `yaml:"port" json:"port"`
+	Configuration   bool   `yaml:"configuration" json:"configuration"`
+	HealthCheck     bool   `yaml:"health-check" json:"healthCheck"`
+	NotFoundHandler bool   `yaml:"not-found-handler" json:"notFoundHandler"`
 }
 
 func newServer() Server {
 	return Server{
 		Host:            "0.0.0.0",
 		Port:            8080,
+		Configuration:   false,
 		HealthCheck:     false,
 		NotFoundHandler: false,
 	}
 }
 
 type Header struct {
-	Enabled bool     `yaml:"enabled"`
-	Key     string   `yaml:"key"`
-	Public  []string `yaml:"public"`
+	Enabled bool     `yaml:"enabled" json:"enabled"`
+	Key     string   `yaml:"key" json:"-"`
+	Public  []string `yaml:"public" json:"public"`
 }
 
 func newHeader() Header {
@@ -47,7 +49,7 @@ func newHeader() Header {
 }
 
 type Authorization struct {
-	Header Header `yaml:"header"`
+	Header Header `yaml:"header" json:"header"`
 }
 
 func newAuthorization() Authorization {
@@ -57,13 +59,13 @@ func newAuthorization() Authorization {
 }
 
 type Database struct {
-	Driver   string `yaml:"driver"`
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	Name     string `yaml:"name"`
-	Schema   string `yaml:"schema"`
+	Driver   string `yaml:"driver" json:"driver"`
+	Host     string `yaml:"host" json:"host"`
+	Port     int    `yaml:"port" json:"port"`
+	User     string `yaml:"user" json:"user"`
+	Password string `yaml:"password" json:"-"`
+	Name     string `yaml:"name" json:"name"`
+	Schema   string `yaml:"schema" json:"schema"`
 }
 
 func newDatabase() Database {
