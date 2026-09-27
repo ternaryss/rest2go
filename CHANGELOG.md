@@ -2,7 +2,7 @@
 
 History of **rest2go** library with changes description.
 
-## Next release
+## 1.2.0 (2026-09-27)
 
 - `FEATURE` REST API for fetching actual configuration
 - `FEATURE` More visible HTTP response log and processing duration
